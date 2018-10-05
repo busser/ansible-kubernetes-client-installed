@@ -1,0 +1,4 @@
+---
+kubectl_version: 1.11
+kubeconfig: "{{ hostvars | json_query('*.kubeconfig | [0]') }}"
+user_home: /home/vagrant

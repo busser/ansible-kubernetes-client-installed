@@ -1,0 +1,40 @@
+---
+# cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+# [kubernetes]
+# name=Kubernetes
+# baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+# enabled=1
+# gpgcheck=1
+# repo_gpgcheck=1
+# gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+# EOF
+- name: Add yum repository
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: yes
+    gpgkey:
+    - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+    - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+# yum install -y kubectl
+- name: Install kubectl
+  yum:
+    pkg:
+    - kubectl-{{ kubectl_version }}.*
+    allow_downgrade: yes
+
+# mkdir -p /home/vagrant/.kube
+- name: Create the /home/vagrant/.kube directory
+  file:
+    path: "{{ user_home }}/.kube"
+    state: directory
+
+# scp master:/etc/kubernetes/admin.conf /home/vagrant/.kube/config
+- name: Write kubectl configuration file
+  copy:
+    content: "{{ kubeconfig }}"
+    dest: "{{ user_home }}/.kube/config"
